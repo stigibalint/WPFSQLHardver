@@ -12,7 +12,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
+using SystemWindows.Navigation;
 using System.Windows.Shapes;
 
 namespace SQL
@@ -23,6 +23,7 @@ namespace SQL
     public partial class MainWindow : Window
     {
         private const string kapcsolatLeiro = "datasource=127.0.0.1;port=3306;username=root;password=;database=hardver;charset=utf8;";
+
         List<Termek> termekek = new List<Termek>();
         MySqlConnection SQLkapcsolat;
         public MainWindow()
@@ -32,6 +33,7 @@ namespace SQL
             KategoriakBetoltese();
             GyartokBetoltese();
             TermekekBetolteseListaba();
+            SzukitoLekerdezesEloallitasa();
             AdatbazisLezarasa();
         }
         private void AdatbazisMegnyitas()
@@ -110,7 +112,7 @@ namespace SQL
             dgTermekek.ItemsSource = termekek;
         }
        
-        private void btnMentes_Click(object sender, RoutedEventArgs e)
+        private void btnMentes_Click(object sener, RoutedEventArgs e)
         {
             StreamWriter sw = new StreamWriter("blabla.csv");
             foreach(var item in termekek)
@@ -121,7 +123,41 @@ namespace SQL
         }
         private string SzukitoLekerdezesEloallitasa()
         {
-            throw new NotImplementedException();
+    
+            bool vanFeltetel = false;
+            string SQLszukitett = $"SELECT * FROM termékek ";
+            if (cbKategoria.SelectedIndex != 0 || cbGyarto.SelectedIndex != 0)
+            {
+                SQLszukitett += "WHERE";
+                if (cbKategoria.SelectedIndex != 0)
+                {
+                    SQLszukitett += $"Kategória = '{cbKategoria.SelectedItem}'";
+                    vanFeltetel = true;
+              
+                }
+                if (cbGyarto.SelectedIndex != 0)
+                {
+                    if (vanFeltetel)
+                    {
+                        SQLszukitett += " AND ";
+                    }
+                    else
+                    {
+                        SQLszukitett += $"Gyártó = '{cbGyarto.SelectedItem}'";
+                        vanFeltetel = true;
+                    }
+                }
+                if (txtTermek.Text != "")
+                {
+                    if (vanFeltetel)
+                    {
+                        SQLszukitett += " AND ";
+                    }
+                    SQLszukitett += $"név LIKE '{txtTermek.Text}'";
+                }
+                return SQLszukitett;
+            }
+
         }
 
     }
